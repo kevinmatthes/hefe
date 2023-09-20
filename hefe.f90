@@ -17,16 +17,27 @@
 !!                                                                            !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-PROGRAM HEFE
-    USE, NON_INTRINSIC :: LIBHEFE, ONLY: BOLD_TEXT_RESET
+SUBMODULE (LIBHEFE) FORMAT
+    USE, NON_INTRINSIC :: LIBHEFE, ONLY: RESET => ESCAPE_RESET
     USE, NON_INTRINSIC :: LIBHEFE, ONLY: INIT_TEXT
 IMPLICIT NONE
-    CHARACTER (:), ALLOCATABLE :: BOLD_TEXT
+CONTAINS
+    PURE SUBROUTINE BOLD_TEXT_RESET (TEXT)
+        USE, NON_INTRINSIC :: LIBHEFE, ONLY: BOLD => ESCAPE_BOLD
+    IMPLICIT NONE
+        CHARACTER (:), ALLOCATABLE                 :: BUFFER
+        CHARACTER (:), INTENT (INOUT), ALLOCATABLE :: TEXT
+        INTEGER                                    :: STRLEN
+        INTRINSIC                                  :: ACHAR
+        INTRINSIC                                  :: LEN
 
-    CALL INIT_TEXT ('Hello,', BOLD_TEXT)
-    CALL BOLD_TEXT_RESET (BOLD_TEXT)
-    PRINT '(A)', BOLD_TEXT // ' World!'
-    DEALLOCATE (BOLD_TEXT)
-END PROGRAM HEFE
+        CALL INIT_TEXT (TEXT, BUFFER)
+        STRLEN = LEN (TEXT) + LEN (BOLD) + LEN (RESET) + 2
+        DEALLOCATE (TEXT)
+        ALLOCATE (CHARACTER (STRLEN) :: TEXT)
+        TEXT = ACHAR (27) // BOLD // BUFFER // ACHAR (27) // RESET
+        DEALLOCATE (BUFFER)
+    END SUBROUTINE BOLD_TEXT_RESET
+END SUBMODULE FORMAT
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
