@@ -30,21 +30,29 @@
 ################################################################################
 
 # Magic numbers.
-aflags     := 'rsv'
-app        := 'hefe'
-ar         := 'ar'
-cflags-app := '-fPIE'
-cflags-lib := '-c -fPIC'
-cflags     := '-std=f2018 -Wall -Werror -Wextra -Wpedantic'
-cc         := 'gfortran'
-lflags     := '-I. -L. -lhefe'
-lib        := 'libhefe.a'
-litter     := '*.mod *.smod'
-o          := '*.o'
-rflags     := '-rfv'
-rm         := 'rm'
+aflags       := 'rsv'
+app          := 'hefe'
+app-call     := './hefe'
+ar           := 'ar'
+cflags-app   := '-fPIE'
+cflags-lib   := '-c -fPIC'
+cflags       := '-std=f2018 -Wall -Werror -Wextra -Wpedantic'
+cc           := 'gfortran'
+lflags       := '-I. -L. -lhefe'
+lib          := 'libhefe.a'
+litter       := '*.mod *.smod'
+o            := '*.o'
+rflags       := '-rfv'
+rm           := 'rm'
+valgrind     := 'valgrind'
+vflags-error := '--error-exitcode=42 --redzone-size=1024'
+vflags-full  := '--leak-check=full --show-leak-kinds=all'
+vflags       := vflags-error + ' ' + vflags-full
 
-# Compile the executable.
+# The default recipe to execute.
+default: valgrind
+
+# Build the executable.
 build:
     just compile libhefe.f90
     just compile memory.f90
@@ -61,5 +69,9 @@ compile f:
 executable f:
     {{ cc }} {{ cflags-app }} {{ cflags }} {{ f }} -o {{ app }} {{ lflags }}
     {{ rm }} {{ rflags }} {{ lib }} {{ litter }}
+
+# Check the executable.
+valgrind: build
+    {{ valgrind }} {{ vflags }} {{ app-call }}
 
 ################################################################################
