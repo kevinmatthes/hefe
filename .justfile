@@ -47,6 +47,7 @@ rm         := 'rm'
 # Compile the executable.
 build:
     just compile libhefe.f90
+    just compile memory.f90
     just compile format.f90
     just executable hefe.f90
 
