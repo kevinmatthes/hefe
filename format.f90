@@ -19,17 +19,25 @@
 
 SUBMODULE (LIBHEFE) FORMAT
     USE, NON_INTRINSIC :: LIBHEFE, ONLY: RESET => ESCAPE_RESET
+    USE, NON_INTRINSIC :: LIBHEFE, ONLY: INIT_TEXT
 IMPLICIT NONE
 CONTAINS
-    PURE SUBROUTINE FORMAT_BOLD (TEXT, FORMATTED)
+    PURE SUBROUTINE BOLD_TEXT_RESET (TEXT)
         USE, NON_INTRINSIC :: LIBHEFE, ONLY: BOLD => ESCAPE_BOLD
     IMPLICIT NONE
-        CHARACTER (*), INTENT (IN)  :: TEXT
-        CHARACTER (*), INTENT (OUT) :: FORMATTED
-        INTRINSIC                   :: ACHAR
+        CHARACTER (:), ALLOCATABLE                 :: BUFFER
+        CHARACTER (:), INTENT (INOUT), ALLOCATABLE :: TEXT
+        INTEGER                                    :: STRLEN
+        INTRINSIC                                  :: ACHAR
+        INTRINSIC                                  :: LEN
 
-        FORMATTED = ACHAR (27) // BOLD // TEXT // ACHAR (27) // RESET
-    END SUBROUTINE FORMAT_BOLD
+        CALL INIT_TEXT (TEXT, BUFFER)
+        STRLEN = LEN (TEXT) + LEN (BOLD) + LEN (RESET) + 2
+        DEALLOCATE (TEXT)
+        ALLOCATE (CHARACTER (STRLEN) :: TEXT)
+        TEXT = ACHAR (27) // BOLD // BUFFER // ACHAR (27) // RESET
+        DEALLOCATE (BUFFER)
+    END SUBROUTINE BOLD_TEXT_RESET
 END SUBMODULE FORMAT
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
