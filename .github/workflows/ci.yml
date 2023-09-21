@@ -87,6 +87,7 @@ jobs:
           tool: just
 
       - run: |
+          sudo apt-get update
           sudo apt-get install valgrind -y
           just
 
