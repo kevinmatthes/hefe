@@ -59,6 +59,6 @@
             ],
             packageNameTemplate: "citation-file-format/cffconvert",
         },
-   ],
+    ],
     schedule: null,
 }
