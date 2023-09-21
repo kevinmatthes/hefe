@@ -86,6 +86,7 @@ jobs:
         with:
           tool: just
 
+      # See <https://github.com/actions/runner-images/issues/59>.
       - run: |
           sudo apt-get update
           sudo apt-get install valgrind -y
