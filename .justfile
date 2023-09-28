@@ -32,7 +32,6 @@
 # Magic numbers.
 aflags       := 'rsv'
 app          := 'hefe'
-app-call     := './hefe'
 ar           := 'ar'
 cflags-app   := '-fPIE'
 cflags-lib   := '-c -fPIC'
@@ -50,15 +49,17 @@ vflags-full  := '--leak-check=full --show-leak-kinds=all'
 vflags       := vflags-error + ' ' + vflags-full
 
 # The default recipe to execute.
-default: valgrind
+default:
+    just tests
 
 # Build the executable.
-build:
-    just compile libhefe.f90
-    just compile memory.f90
-    just compile viewport.f90
-    just compile format.f90
-    just executable hefe.f90
+build: library
+    just executable src/hefe.f90 hefe
+    just clean
+
+# Remove cmopilation artifacts.
+clean:
+    {{ rm }} {{ rflags }} {{ lib }} {{ litter }}
 
 # Compile a single library source file.
 compile f:
@@ -67,12 +68,28 @@ compile f:
     {{ rm }} {{ rflags }} {{ o }}
 
 # Compile the executable.
-executable f:
-    {{ cc }} {{ cflags-app }} {{ cflags }} {{ f }} -o {{ app }} {{ lflags }}
-    {{ rm }} {{ rflags }} {{ lib }} {{ litter }}
+executable f o:
+    {{ cc }} {{ cflags-app }} {{ cflags }} {{ f }} -o {{ o }} {{ lflags }}
+
+# Compile the library.
+library:
+    just compile src/libhefe.f90
+    just compile src/memory.f90
+    just compile src/viewport.f90
+    just compile src/format.f90
+
+# Compile and run a single test.
+test f: library
+    just executable {{ f }} test
+    just valgrind ./test
+    {{ rm }} {{ rflags }} test
+
+# Compile and run all tests.
+tests:
+    just test tests/stringify_integer.f90
 
 # Check the executable.
-valgrind: build
-    {{ valgrind }} {{ vflags }} {{ app-call }}
+valgrind a:
+    {{ valgrind }} {{ vflags }} {{ a }}
 
 ################################################################################
