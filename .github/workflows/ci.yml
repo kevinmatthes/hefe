@@ -82,7 +82,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: taiki-e/install-action@v2.44.26
+      - uses: taiki-e/install-action@v2.44.27
         with:
           tool: just
 
